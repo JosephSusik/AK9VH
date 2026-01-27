@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     public float moveSpeed = 5f;
+    public float jumpSpeed = 10f;
     private bool facingRight = true;
     private Vector2 moveInput;
 
@@ -19,6 +20,7 @@ public class PlayerController : MonoBehaviour
     private InputAction moveAction;
     private InputAction attackAction;
     private InputAction hurtAction;
+    private InputAction jumpAction;
 
     private void Awake()
     {
@@ -26,20 +28,16 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
         playerInput = GetComponent<PlayerInput>();
 
-        if (playerInput == null)
-        {
-            Debug.LogError("PlayerInput component not found! Add it to this GameObject.");
-            return;
-        }
-
         // Link actions from your PlayerControls asset
         moveAction = playerInput.actions["Move"];
         attackAction = playerInput.actions["Attack"];
         hurtAction = playerInput.actions["Hurt"];
+        jumpAction = playerInput.actions["Jump"];
 
         // Subscribe to single-press events
         attackAction.started += ctx => Attack();
         hurtAction.started += ctx => Hurt();
+        jumpAction.started += ctx => Jump();
     }
 
     private void OnEnable()
@@ -47,6 +45,7 @@ public class PlayerController : MonoBehaviour
         moveAction.Enable();
         attackAction.Enable();
         hurtAction.Enable();
+        jumpAction.Enable();
     }
 
     private void OnDisable()
@@ -54,6 +53,7 @@ public class PlayerController : MonoBehaviour
         moveAction.Disable();
         attackAction.Disable();
         hurtAction.Disable();
+        jumpAction.Disable();
     }
 
     private void Update()
@@ -72,6 +72,19 @@ public class PlayerController : MonoBehaviour
 
     private void Attack() => animator.SetTrigger("IsAttacking");
     private void Hurt() => animator.SetTrigger("IsHurt");
+
+    private void Jump()
+    {
+        if (IsGrounded())
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpSpeed);
+        }
+    }
+
+    private bool IsGrounded()
+    {
+        return Mathf.Abs(rb.linearVelocity.y) < 0.001f;
+    }
 
     private void Flip()
     {
