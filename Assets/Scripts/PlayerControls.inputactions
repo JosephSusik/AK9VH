@@ -41,15 +41,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "Pause",
-                    "type": "Button",
-                    "id": "38cec664-a1df-4f6d-a481-2d1bcdc5b657",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -140,10 +131,36 @@
                     "action": "Jump",
                     "isComposite": false,
                     "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "UI",
+            "id": "a77d326a-b5ae-4d17-a2d1-3ea2e27c4e57",
+            "actions": [
+                {
+                    "name": "Pause",
+                    "type": "Button",
+                    "id": "4a2cb76d-a5b4-4511-aa7e-c031ff8dc42e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
+                    "name": "Menu",
+                    "type": "Button",
+                    "id": "16be1b75-882f-4e40-832c-1667e8502b44",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
                     "name": "",
-                    "id": "adb62ff4-9068-4dc5-86a2-b24b81ff2c2e",
+                    "id": "5c1897d3-04f2-436c-9997-b287d0c62c21",
                     "path": "<Keyboard>/p",
                     "interactions": "",
                     "processors": "",
@@ -154,12 +171,23 @@
                 },
                 {
                     "name": "",
-                    "id": "ab9094d8-7204-4c4c-8d17-ada954e983b1",
+                    "id": "9a247238-b9e2-4ac5-b18c-b5c790be96b6",
                     "path": "<Keyboard>/escape",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bec6043a-06fb-4532-8a9c-3398f368763b",
+                    "path": "<Keyboard>/m",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Menu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
