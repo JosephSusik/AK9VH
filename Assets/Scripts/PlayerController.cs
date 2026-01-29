@@ -50,6 +50,10 @@ public class PlayerController : MonoBehaviour
 
     private void OnDisable()
     {
+        attackAction.started -= ctx => Attack();
+        hurtAction.started -= ctx => Hurt();
+        jumpAction.started -= ctx => Jump();
+
         moveAction.Disable();
         attackAction.Disable();
         hurtAction.Disable();
