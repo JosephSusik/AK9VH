@@ -16,12 +16,6 @@ public class PlayerController : MonoBehaviour
     [Header("Components")]
     private Rigidbody2D rb;
     private Animator animator;
-    private PlayerInput playerInput;
-
-    private InputAction moveAction;
-    private InputAction attackAction;
-    private InputAction hurtAction;
-    private InputAction jumpAction;
     private PlayerStats stats;
 
     [Header("Combat Logic")]
@@ -33,38 +27,12 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        playerInput = GetComponent<PlayerInput>();
-
-        moveAction = playerInput.actions["Move"];
-        attackAction = playerInput.actions["Attack"];
-        hurtAction = playerInput.actions["Hurt"];
-        jumpAction = playerInput.actions["Jump"];
-
-        attackAction.started += OnAttack;
-        hurtAction.started += OnHurt;
-        jumpAction.started += OnJump;
-
         stats = GetComponent<PlayerStats>();
-    }
-
-    private void OnEnable()
-    {
-        moveAction.Enable();
-        attackAction.Enable();
-        hurtAction.Enable();
-        jumpAction.Enable();
-    }
-
-    private void OnDisable()
-    {
-        attackAction.started -= OnAttack;
-        hurtAction.started -= OnHurt;
-        jumpAction.started -= OnJump;
     }
 
     private void Update()
     {
-        moveInput = moveAction.ReadValue<Vector2>();
+        if (Time.timeScale == 0f) return; // Ignore input when game is paused
 
         if (moveInput.x > 0 && !facingRight) Flip();
         else if (moveInput.x < 0 && facingRight) Flip();
@@ -78,6 +46,8 @@ public class PlayerController : MonoBehaviour
     }
     private void Attack()
     {
+        if (Time.timeScale == 0f) return; // Ignore input when game is paused
+
         if (stats.UseStamina(50f))
         {
             animator.SetTrigger("IsAttacking");
@@ -124,9 +94,10 @@ public class PlayerController : MonoBehaviour
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpSpeed);
         }
     }
-    private void OnAttack(InputAction.CallbackContext ctx) => Attack();
-    private void OnHurt(InputAction.CallbackContext ctx) => Hurt();
-    private void OnJump(InputAction.CallbackContext ctx) => Jump();
+    public void OnMove(InputValue value) => moveInput = value.Get<Vector2>();
+    public void OnJump(InputValue value) { if (value.isPressed) Jump(); }
+    public void OnAttack(InputValue value) { if (value.isPressed) Attack(); }
+    public void OnHurt(InputValue value) { if (value.isPressed) Hurt(); }
 
     private bool IsGrounded()
     {

@@ -11,28 +11,45 @@ public class PauseManager : MonoBehaviour
     private PlayerStats pStats;
     private bool isPaused = false;
 
-    public void TogglePause()
+    public void OnPause(InputValue value)
     {
-        isPaused = !isPaused;
-        pauseMenuObject.SetActive(isPaused);
-        Time.timeScale = isPaused ? 0f : 1f;
-
-        if (isPaused)
-        {
-            if (pStats == null) pStats = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerStats>();
-
-            statsDisplayText.text = $"Health: {Mathf.RoundToInt(pStats.currentHealth)} / {pStats.maxHealth}\n" +
-                                    $"Stamina: {Mathf.RoundToInt(pStats.currentStamina)} / {pStats.maxStamina}\n" +
-                                    $"Atk Power: {pStats.attackDamage}";
-        }
+        if (value.isPressed) TogglePause();
     }
 
     public void OnMenu(InputValue value)
     {
-        if (isPaused && value.isPressed)
+        if (value.isPressed) BackToMenu();
+    }
+
+    public void OnQuit(InputValue value)
+    {
+        if (value.isPressed)
         {
-            BackToMenu();
+            Debug.Log("Exiting Application...");
+            Application.Quit();
         }
+    }
+
+    public void TogglePause()
+    {
+        isPaused = !isPaused;
+        pauseMenuObject.SetActive(isPaused);
+
+        Time.timeScale = isPaused ? 0f : 1f;
+
+        if (isPaused)
+        {
+            UpdateUI();
+        }
+    }
+
+    private void UpdateUI()
+    {
+        if (pStats == null) pStats = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerStats>();
+
+        statsDisplayText.text = $"Health: {Mathf.RoundToInt(pStats.currentHealth)} / {pStats.maxHealth}\n" +
+                                $"Stamina: {Mathf.RoundToInt(pStats.currentStamina)} / {pStats.maxStamina}\n" +
+                                $"Atk power: {pStats.attackDamage}";
     }
 
     public void BackToMenu()

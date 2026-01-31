@@ -382,6 +382,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1230389297}
     m_Modifications:
+    - target: {fileID: 1417655887457223462, guid: 90d6c2996c0571c4792ad547b737dbe5, type: 3}
+      propertyPath: m_DefaultActionMap
+      value: Gameplay
+      objectReference: {fileID: 0}
     - target: {fileID: 4303833902768066488, guid: 90d6c2996c0571c4792ad547b737dbe5, type: 3}
       propertyPath: startLevelName
       value: MainMenu
@@ -1128,8 +1132,12 @@ PrefabInstance:
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 8485461213766227148, guid: 6319d663f8fc3154888b4e9dd2450e6d, type: 3}
+      propertyPath: m_DefaultActionMap
+      value: Gameplay
+      objectReference: {fileID: 0}
+    - target: {fileID: 8485461213766227148, guid: 6319d663f8fc3154888b4e9dd2450e6d, type: 3}
       propertyPath: m_NotificationBehavior
-      value: 3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8485461213766227148, guid: 6319d663f8fc3154888b4e9dd2450e6d, type: 3}
       propertyPath: m_ActionEvents.Array.size
@@ -1172,6 +1180,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6097078858504283785, guid: 6319d663f8fc3154888b4e9dd2450e6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1600693304557545639}
+    - targetCorrespondingSourceObject: {fileID: 6097078858504283785, guid: 6319d663f8fc3154888b4e9dd2450e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1600693304557545640}
   m_SourcePrefab: {fileID: 100100000, guid: 6319d663f8fc3154888b4e9dd2450e6d, type: 3}
 --- !u!1 &1600693304557545638 stripped
 GameObject:
@@ -1198,6 +1209,20 @@ MonoBehaviour:
   currentStamina: 0
   staminaRegenRate: 5
   attackDamage: 20
+--- !u!114 &1600693304557545640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1600693304557545638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13f3760432ee35c44b360e033830942d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PauseManager
+  pauseMenuObject: {fileID: 281343532}
+  statsDisplayText: {fileID: 313357938}
 --- !u!1001 &1679020218496985007
 PrefabInstance:
   m_ObjectHideFlags: 0
