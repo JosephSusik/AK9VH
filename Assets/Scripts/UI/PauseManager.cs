@@ -31,11 +31,19 @@ public class PauseManager : MonoBehaviour
         }
     }
 
+    public void OnRestart(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            RestartGame();
+        }
+    }
+
     public void OnQuit(InputValue value)
     {
         if (value.isPressed)
         {
-            LevelManager.Instance.QuitGame();
+            QuitGame();
         }
     }
 
@@ -55,6 +63,17 @@ public class PauseManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         LevelManager.Instance.LoadMenu();
+    }
+
+    public void RestartGame()
+    {
+        Time.timeScale = 1f;
+        LevelManager.Instance.LoadGame();
+    }
+
+    public void QuitGame()
+    {
+        LevelManager.Instance.QuitGame();
     }
 
     private void UpdatePausedText()
