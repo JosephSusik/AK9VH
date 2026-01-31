@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3778365828915452943}
   - component: {fileID: 5887979589919509818}
   - component: {fileID: -5776315204034335308}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -195,3 +195,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   moveSpeed: 5
   moveTime: 2
+  maxHealth: 100

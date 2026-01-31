@@ -159,6 +159,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   moveSpeed: 15
   jumpSpeed: 15
+  attackPoint: {fileID: 0}
+  attackRange: 0.5
+  enemyLayers:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &8485461213766227148
 MonoBehaviour:
   m_ObjectHideFlags: 0

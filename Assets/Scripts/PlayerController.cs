@@ -88,11 +88,27 @@ public class PlayerController : MonoBehaviour
     IEnumerator DelayedAttackCheck()
     {
         yield return new WaitForSeconds(0.15f);
-        Collider2D[] hits = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(
+            attackPoint.position,
+            attackRange,
+            enemyLayers
+        );
 
         if (hits.Length == 0)
         {
             stats.TakeDamage(stats.attackDamage);
+        }
+
+
+        foreach (Collider2D hit in hits)
+        {
+            EnemyController enemy = hit.GetComponent<EnemyController>();
+            if (enemy != null)
+            {
+                Debug.Log($"Enemy hit: {enemy.name} took {stats.attackDamage} damage");
+                enemy.TakeDamage(stats.attackDamage);
+            }
         }
     }
 

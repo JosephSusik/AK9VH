@@ -8,6 +8,10 @@ public class EnemyController : MonoBehaviour
 
     private bool facingRight = true;
 
+    [Header("Combat")]
+    public float maxHealth = 50f;
+    private float currentHealth;
+
     [Header("Components")]
     private Rigidbody2D rb;
     private Animator animator;
@@ -18,25 +22,46 @@ public class EnemyController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
 
+        currentHealth = maxHealth;
+
         timer = moveTime;
         animator.SetBool("isWalking", true);
     }
 
     void FixedUpdate()
     {
-        // Determine direction based on facing
         Vector2 direction = facingRight ? Vector2.right : Vector2.left;
 
-        // Move enemy
         rb.MovePosition(rb.position + direction * moveSpeed * Time.fixedDeltaTime);
 
-        // Countdown to flip
         timer -= Time.fixedDeltaTime;
         if (timer <= 0f)
         {
             Flip();
             timer = moveTime;
         }
+    }
+
+    public void TakeDamage(float damage)
+    {
+        currentHealth -= damage;
+        Debug.Log($"Enemy hp: {currentHealth}");
+
+        animator.SetTrigger("isHurt");
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        animator.SetTrigger("isDead");
+        rb.simulated = false;
+        GetComponent<Collider2D>().enabled = false;
+
+        Destroy(gameObject, 0.6f);
     }
 
     private void Flip()
