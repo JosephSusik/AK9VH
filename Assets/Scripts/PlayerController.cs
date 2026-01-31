@@ -28,16 +28,14 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
         playerInput = GetComponent<PlayerInput>();
 
-        // Link actions from your PlayerControls asset
         moveAction = playerInput.actions["Move"];
         attackAction = playerInput.actions["Attack"];
         hurtAction = playerInput.actions["Hurt"];
         jumpAction = playerInput.actions["Jump"];
 
-        // Subscribe to single-press events
-        attackAction.started += ctx => Attack();
-        hurtAction.started += ctx => Hurt();
-        jumpAction.started += ctx => Jump();
+        attackAction.started += OnAttack;
+        hurtAction.started += OnHurt;
+        jumpAction.started += OnJump;
     }
 
     private void OnEnable()
@@ -50,32 +48,34 @@ public class PlayerController : MonoBehaviour
 
     private void OnDisable()
     {
-        attackAction.started -= ctx => Attack();
-        hurtAction.started -= ctx => Hurt();
-        jumpAction.started -= ctx => Jump();
-
-        moveAction.Disable();
-        attackAction.Disable();
-        hurtAction.Disable();
-        jumpAction.Disable();
+        attackAction.started -= OnAttack;
+        hurtAction.started -= OnHurt;
+        jumpAction.started -= OnJump;
     }
 
     private void Update()
     {
-        // Movement
         moveInput = moveAction.ReadValue<Vector2>();
-        rb.linearVelocity = new Vector2(moveInput.x * moveSpeed, rb.linearVelocity.y);
 
-        // Flip character
         if (moveInput.x > 0 && !facingRight) Flip();
         else if (moveInput.x < 0 && facingRight) Flip();
 
-        // Animations
         animator.SetFloat("Speed", Mathf.Abs(moveInput.x));
     }
 
-    private void Attack() => animator.SetTrigger("IsAttacking");
-    private void Hurt() => animator.SetTrigger("IsHurt");
+    private void FixedUpdate()
+    {
+        rb.linearVelocity = new Vector2(moveInput.x * moveSpeed, rb.linearVelocity.y);
+    }
+    private void Attack()
+    {
+        animator.SetTrigger("IsAttacking");
+    }
+
+    private void Hurt()
+    {
+        animator.SetTrigger("IsHurt");
+    }
 
     private void Jump()
     {
@@ -84,10 +84,13 @@ public class PlayerController : MonoBehaviour
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpSpeed);
         }
     }
+    private void OnAttack(InputAction.CallbackContext ctx) => Attack();
+    private void OnHurt(InputAction.CallbackContext ctx) => Hurt();
+    private void OnJump(InputAction.CallbackContext ctx) => Jump();
 
     private bool IsGrounded()
     {
-        return Mathf.Abs(rb.linearVelocity.y) < 0.001f;
+        return rb.linearVelocity.y <= 0.01f;
     }
 
     private void Flip()

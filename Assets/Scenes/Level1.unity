@@ -434,6 +434,38 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 8485461213766227148, guid: 6319d663f8fc3154888b4e9dd2450e6d, type: 3}
+      propertyPath: m_NotificationBehavior
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8485461213766227148, guid: 6319d663f8fc3154888b4e9dd2450e6d, type: 3}
+      propertyPath: m_ActionEvents.Array.size
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8485461213766227148, guid: 6319d663f8fc3154888b4e9dd2450e6d, type: 3}
+      propertyPath: m_ActionEvents.Array.data[4].m_ActionId
+      value: 6aee7693-a291-498a-b286-ff4c1223e56b
+      objectReference: {fileID: 0}
+    - target: {fileID: 8485461213766227148, guid: 6319d663f8fc3154888b4e9dd2450e6d, type: 3}
+      propertyPath: m_ActionEvents.Array.data[5].m_ActionId
+      value: 4a2cb76d-a5b4-4511-aa7e-c031ff8dc42e
+      objectReference: {fileID: 0}
+    - target: {fileID: 8485461213766227148, guid: 6319d663f8fc3154888b4e9dd2450e6d, type: 3}
+      propertyPath: m_ActionEvents.Array.data[6].m_ActionId
+      value: 16be1b75-882f-4e40-832c-1667e8502b44
+      objectReference: {fileID: 0}
+    - target: {fileID: 8485461213766227148, guid: 6319d663f8fc3154888b4e9dd2450e6d, type: 3}
+      propertyPath: m_ActionEvents.Array.data[4].m_ActionName
+      value: 'Player/Menu[/Keyboard/m]'
+      objectReference: {fileID: 0}
+    - target: {fileID: 8485461213766227148, guid: 6319d663f8fc3154888b4e9dd2450e6d, type: 3}
+      propertyPath: m_ActionEvents.Array.data[5].m_ActionName
+      value: 'UI/Pause[/Keyboard/p,/Keyboard/escape]'
+      objectReference: {fileID: 0}
+    - target: {fileID: 8485461213766227148, guid: 6319d663f8fc3154888b4e9dd2450e6d, type: 3}
+      propertyPath: m_ActionEvents.Array.data[6].m_ActionName
+      value: 'UI/Menu[/Keyboard/m]'
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
