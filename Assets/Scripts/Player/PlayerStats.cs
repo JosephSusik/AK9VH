@@ -67,6 +67,6 @@ public class PlayerStats : MonoBehaviour
 
     private void Die()
     {
-        // TODO: hanel player death
+        LevelManager.Instance.LoadGameOver();
     }
 }

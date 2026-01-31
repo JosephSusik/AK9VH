@@ -8,6 +8,7 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private string startLevelName = "Level1";
     [SerializeField] private string controlsLevelName = "Controls";
     [SerializeField] private string mainMenuName = "MainMenu";
+    [SerializeField] private string gameOverLevelName = "GameOver";
 
     private void Awake()
     {
@@ -22,5 +23,6 @@ public class LevelManager : MonoBehaviour
     public void LoadGame() => SceneManager.LoadScene(startLevelName);
     public void LoadControls() => SceneManager.LoadScene(controlsLevelName);
     public void LoadMenu() => SceneManager.LoadScene(mainMenuName);
+    public void LoadGameOver() => SceneManager.LoadScene(gameOverLevelName);
     public void QuitGame() => Application.Quit();
 }
