@@ -1,28 +1,29 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class PauseManager : MonoBehaviour
 {
     [SerializeField] private GameObject pauseMenuObject;
+    [SerializeField] private TextMeshProUGUI statsDisplayText;
 
+    private PlayerStats pStats;
     private bool isPaused = false;
 
     public void TogglePause()
     {
         isPaused = !isPaused;
+        pauseMenuObject.SetActive(isPaused);
+        Time.timeScale = isPaused ? 0f : 1f;
 
         if (isPaused)
         {
-            pauseMenuObject.SetActive(true);
-            Time.timeScale = 0f;
-            GetComponent<PlayerInput>().actions.FindActionMap("Player").Disable();
-        }
-        else
-        {
-            pauseMenuObject.SetActive(false);
-            Time.timeScale = 1f;
-            GetComponent<PlayerInput>().actions.FindActionMap("Player").Enable();
+            if (pStats == null) pStats = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerStats>();
+
+            statsDisplayText.text = $"Health: {Mathf.RoundToInt(pStats.currentHealth)} / {pStats.maxHealth}\n" +
+                                    $"Stamina: {Mathf.RoundToInt(pStats.currentStamina)} / {pStats.maxStamina}\n" +
+                                    $"Atk Power: {pStats.attackDamage}";
         }
     }
 

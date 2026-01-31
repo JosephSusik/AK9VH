@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Animator))]
@@ -21,6 +22,12 @@ public class PlayerController : MonoBehaviour
     private InputAction attackAction;
     private InputAction hurtAction;
     private InputAction jumpAction;
+    private PlayerStats stats;
+
+    [Header("Combat Logic")]
+    public Transform attackPoint;
+    public float attackRange = 0.5f;
+    public LayerMask enemyLayers;
 
     private void Awake()
     {
@@ -36,6 +43,8 @@ public class PlayerController : MonoBehaviour
         attackAction.started += OnAttack;
         hurtAction.started += OnHurt;
         jumpAction.started += OnJump;
+
+        stats = GetComponent<PlayerStats>();
     }
 
     private void OnEnable()
@@ -69,7 +78,22 @@ public class PlayerController : MonoBehaviour
     }
     private void Attack()
     {
-        animator.SetTrigger("IsAttacking");
+        if (stats.UseStamina(50f))
+        {
+            animator.SetTrigger("IsAttacking");
+            StartCoroutine(DelayedAttackCheck());
+        }
+    }
+
+    IEnumerator DelayedAttackCheck()
+    {
+        yield return new WaitForSeconds(0.15f);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
+
+        if (hits.Length == 0)
+        {
+            stats.TakeDamage(stats.attackDamage);
+        }
     }
 
     private void Hurt()
