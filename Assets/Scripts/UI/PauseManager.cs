@@ -27,7 +27,7 @@ public class PauseManager : MonoBehaviour
     {
         if (value.isPressed)
         {
-            LevelManager.Instance.LoadMenu();
+            BackToMenu();
         }
     }
 
@@ -49,6 +49,12 @@ public class PauseManager : MonoBehaviour
         {
             UpdatePausedText();
         }
+    }
+
+    public void BackToMenu()
+    {
+        Time.timeScale = 1f;
+        LevelManager.Instance.LoadMenu();
     }
 
     private void UpdatePausedText()
