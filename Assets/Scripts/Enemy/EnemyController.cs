@@ -11,6 +11,7 @@ public class EnemyController : MonoBehaviour
     [Header("Combat")]
     public float maxHealth = 50f;
     private float currentHealth;
+    public float damage = 35f;
 
     [Header("Components")]
     private Rigidbody2D rb;
@@ -71,5 +72,17 @@ public class EnemyController : MonoBehaviour
         Vector3 scale = transform.localScale;
         scale.x *= -1;
         transform.localScale = scale;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            PlayerStats playerStats = collision.gameObject.GetComponent<PlayerStats>();
+            if (playerStats != null)
+            {
+                playerStats.TakeDamage(damage);
+            }
+        }
     }
 }

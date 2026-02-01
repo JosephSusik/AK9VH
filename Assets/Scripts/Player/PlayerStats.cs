@@ -13,6 +13,10 @@ public class PlayerStats : MonoBehaviour
     public float staminaRegenRate = 15f;
     public float attackDamage = 20f;
 
+    [Header("Invincibility")]
+    public float invincibilityDuration = 1f;
+    private float invincibilityTimer;
+
     public float CurrentHealth { get; private set; }
     public float CurrentStamina { get; private set; }
 
@@ -29,6 +33,11 @@ public class PlayerStats : MonoBehaviour
     {
         RegenerateStamina();
         UpdateUI();
+
+        if (invincibilityTimer > 0)
+        {
+            invincibilityTimer -= Time.deltaTime;
+        }
     }
 
     private void RegenerateStamina()
@@ -41,8 +50,16 @@ public class PlayerStats : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
+        if (invincibilityTimer > 0)
+        {
+            return;
+        }
+
         CurrentHealth = Mathf.Clamp(CurrentHealth - damage, 0, maxHealth);
         animator.SetTrigger("IsHurt");
+
+        invincibilityTimer = invincibilityDuration;
+
         if (CurrentHealth <= 0)
         {
             Die();
