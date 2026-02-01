@@ -74,15 +74,26 @@ public class EnemyController : MonoBehaviour
         transform.localScale = scale;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+   private void OnCollisionEnter2D(Collision2D collision)
+{
+    if (collision.gameObject.CompareTag("Player"))
     {
-        if (collision.gameObject.CompareTag("Player"))
+        PlayerStats playerStats = collision.gameObject.GetComponent<PlayerStats>();
+        if (playerStats == null) return;
+
+        // Is player to the right of the enemy?
+        bool playerOnRight = collision.transform.position.x > transform.position.x;
+
+        // Check if enemy is facing the player
+        bool facingPlayer =
+            (facingRight && playerOnRight) ||
+            (!facingRight && !playerOnRight);
+
+        if (facingPlayer)
         {
-            PlayerStats playerStats = collision.gameObject.GetComponent<PlayerStats>();
-            if (playerStats != null)
-            {
-                playerStats.TakeDamage(damage);
-            }
+            animator.SetTrigger("isAttacking");
+            playerStats.TakeDamage(damage);
         }
     }
+}
 }
