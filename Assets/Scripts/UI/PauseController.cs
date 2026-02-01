@@ -3,11 +3,10 @@ using UnityEngine.InputSystem;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-public class PauseManager : MonoBehaviour
+public class PauseController : MonoBehaviour
 {
     [SerializeField] private GameObject pauseMenuObject;
     [SerializeField] private TextMeshProUGUI statsText;
-
     private bool isPaused;
 
     public void OnPause(InputValue value)
@@ -57,36 +56,37 @@ public class PauseManager : MonoBehaviour
     public void BackToMenu()
     {
         Time.timeScale = 1f;
-        LevelManager.Instance.LoadMenu();
+        SceneManager.Instance.ChangeScene(SceneManager.GameScene.MainMenu);
     }
 
     public void RestartGame()
     {
         Time.timeScale = 1f;
-        LevelManager.Instance.LoadGame();
+        SceneManager.Instance.RestartGame();
     }
 
     public void QuitGame()
     {
-        LevelManager.Instance.QuitGame();
+        SceneManager.Instance.QuitGame();
     }
 
     private void UpdatePausedText()
     {
-        statsText.text = $"Health: {Mathf.RoundToInt(PlayerStats.Instance.CurrentHealth)} / {PlayerStats.Instance.maxHealth}\n" +
-                         $"Stamina: {Mathf.RoundToInt(PlayerStats.Instance.CurrentStamina)} / {PlayerStats.Instance.maxStamina}\n" +
-                         $"Attack: {PlayerStats.Instance.attackDamage}\n" +
-                         $"Upgrade points: {PlayerStats.Instance.upgradePoints}";
+        var stats = PlayerStats.Instance;
+        statsText.text = $"Health: {Mathf.RoundToInt(stats.CurrentHealth)} / {stats.maxHealth}\n" +
+                         $"Stamina: {Mathf.RoundToInt(stats.CurrentStamina)} / {stats.maxStamina}\n" +
+                         $"Attack: {stats.attackDamage}\n" +
+                         $"Upgrade points: {stats.upgradePoints}";
     }
 
     private void OnEnable()
     {
-        SceneManager.sceneLoaded += OnLevelFinishedLoading;
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnLevelFinishedLoading;
     }
 
     private void OnDisable()
     {
-        SceneManager.sceneLoaded -= OnLevelFinishedLoading;
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnLevelFinishedLoading;
     }
 
     private void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)

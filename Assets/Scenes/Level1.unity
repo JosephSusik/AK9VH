@@ -1170,6 +1170,10 @@ PrefabInstance:
       value: Upgrade
       objectReference: {fileID: 0}
     - target: {fileID: 3529371794487012353, guid: 83e9d75d8afede048addfabd95d71d27, type: 3}
+      propertyPath: targetScene
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3529371794487012353, guid: 83e9d75d8afede048addfabd95d71d27, type: 3}
       propertyPath: levelManager
       value: 
       objectReference: {fileID: 0}

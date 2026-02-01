@@ -2,11 +2,13 @@ using UnityEngine;
 
 public class MenuController : MonoBehaviour
 {
-    public void OnStartButtonPressed() => LevelManager.Instance.LoadGame();
+    public void OnStartButtonPressed() => SceneManager.Instance.ChangeScene(SceneManager.GameScene.Level1);
 
-    public void OnControlsButtonPressed() => LevelManager.Instance.LoadControls();
+    public void OnControlsButtonPressed() => SceneManager.Instance.ChangeScene(SceneManager.GameScene.Controls);
 
-    public void OnBackButtonPressed() => LevelManager.Instance.LoadMenu();
+    public void OnBackButtonPressed() => SceneManager.Instance.ChangeScene(SceneManager.GameScene.MainMenu);
 
-    public void OnQuitButtonPressed() => LevelManager.Instance.QuitGame();
+    public void OnQuitButtonPressed() => SceneManager.Instance.QuitGame();
+
+    public void OnRestartButtonPressed() => SceneManager.Instance.RestartGame();
 }

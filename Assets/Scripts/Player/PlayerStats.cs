@@ -102,7 +102,7 @@ public class PlayerStats : MonoBehaviour
 
     private void Die()
     {
-        LevelManager.Instance.LoadGameOver();
+        SceneManager.Instance.ChangeScene(SceneManager.GameScene.GameOver);
     }
 
     public void AddUpgradePoints(int amount)
@@ -112,12 +112,12 @@ public class PlayerStats : MonoBehaviour
 
     private void OnEnable()
     {
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)

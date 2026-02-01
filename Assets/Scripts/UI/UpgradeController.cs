@@ -3,62 +3,55 @@ using TMPro;
 
 public class UpgradeController : MonoBehaviour
 {
-    [Header("UI")]
     [SerializeField] private TextMeshProUGUI availablePointsText;
     [SerializeField] private TextMeshProUGUI healthStatsText;
     [SerializeField] private TextMeshProUGUI staminaStatsText;
     [SerializeField] private TextMeshProUGUI attackStatsText;
-
-    [Header("Settings")]
     public int upgradeCost = 1;
 
     private void Update()
     {
-        if (PlayerStats.Instance != null)
+        var stats = PlayerStats.Instance;
+        if (stats != null)
         {
-            availablePointsText.text = $"Points: {PlayerStats.Instance.upgradePoints}";
-            healthStatsText.text = $"Max health: {PlayerStats.Instance.maxHealth}";
-            staminaStatsText.text = $"Max stamina: {PlayerStats.Instance.maxStamina}";
-            attackStatsText.text = $"Attack power: {PlayerStats.Instance.attackDamage}";
+            availablePointsText.text = $"Points: {stats.upgradePoints}";
+            healthStatsText.text = $"Max health: {stats.maxHealth}";
+            staminaStatsText.text = $"Max stamina: {stats.maxStamina}";
+            attackStatsText.text = $"Attack power: {stats.attackDamage}";
         }
     }
 
-    public void UpgradeHealth()
+    public void UpgradeHealth() => PurchaseUpgrade(() => {
+        PlayerStats.Instance.maxHealth += 20f;
+        PlayerStats.Instance.TakeDamage(-20f);
+    });
+
+    public void UpgradeStamina() => PurchaseUpgrade(() =>
+    {
+        PlayerStats.Instance.maxStamina += 20f;
+    });
+
+    public void UpgradeAttack() => PurchaseUpgrade(() =>
+    {
+        PlayerStats.Instance.attackDamage += 5f;
+    });
+
+    private void PurchaseUpgrade(System.Action upgrade)
     {
         if (PlayerStats.Instance.upgradePoints >= upgradeCost)
         {
             PlayerStats.Instance.upgradePoints -= upgradeCost;
-            PlayerStats.Instance.maxHealth += 20f;
-            // The least intuitive way to heal the player
-            PlayerStats.Instance.TakeDamage(-20f);
-        }
-    }
-
-    public void UpgradeStamina()
-    {
-        if (PlayerStats.Instance.upgradePoints >= upgradeCost)
-        {
-            PlayerStats.Instance.upgradePoints -= upgradeCost;
-            PlayerStats.Instance.maxStamina += 20f;
-        }
-    }
-
-    public void UpgradeAttack()
-    {
-        if (PlayerStats.Instance.upgradePoints >= upgradeCost)
-        {
-            PlayerStats.Instance.upgradePoints -= upgradeCost;
-            PlayerStats.Instance.attackDamage += 5f;
+            upgrade.Invoke();
         }
     }
 
     public void StartNextLevel()
     {
-        LevelManager.Instance.LoadLevelByName("Level2");
+        SceneManager.Instance.ChangeScene(SceneManager.GameScene.Level2);
     }
 
     public void BackToMenu()
     {
-        LevelManager.Instance.LoadMenu();
+        SceneManager.Instance.ChangeScene(SceneManager.GameScene.MainMenu);
     }
 }
