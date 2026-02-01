@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EnemyController : MonoBehaviour
 {
@@ -13,7 +14,9 @@ public class EnemyController : MonoBehaviour
     private float currentHealth;
     public float damage = 35f;
 
-    [Header("Components")]
+    [Header("UI")]
+    public Image healthBarFill;
+
     private Rigidbody2D rb;
     private Animator animator;
     private float timer;
@@ -24,6 +27,7 @@ public class EnemyController : MonoBehaviour
         animator = GetComponent<Animator>();
 
         currentHealth = maxHealth;
+        UpdateHealthBar();
 
         timer = moveTime;
         animator.SetBool("isWalking", true);
@@ -46,7 +50,11 @@ public class EnemyController : MonoBehaviour
     public void TakeDamage(float damage)
     {
         currentHealth -= damage;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
         Debug.Log($"Enemy hp: {currentHealth}");
+
+        UpdateHealthBar();
 
         animator.SetTrigger("isHurt");
 
@@ -54,6 +62,12 @@ public class EnemyController : MonoBehaviour
         {
             Die();
         }
+    }
+
+    private void UpdateHealthBar()
+    {
+        if (healthBarFill != null)
+            healthBarFill.fillAmount = currentHealth / maxHealth;
     }
 
     private void Die()
