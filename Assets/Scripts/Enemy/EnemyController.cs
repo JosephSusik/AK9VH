@@ -72,11 +72,10 @@ public class EnemyController : MonoBehaviour
 
     private void Die()
     {
+        Debug.Log($"enemy dies hp: {currentHealth}");
         animator.SetTrigger("isDead");
         rb.simulated = false;
         GetComponent<Collider2D>().enabled = false;
-
-        Destroy(gameObject, 0.6f);
     }
 
     private void Flip()
@@ -88,26 +87,30 @@ public class EnemyController : MonoBehaviour
         transform.localScale = scale;
     }
 
-   private void OnCollisionEnter2D(Collision2D collision)
-{
-    if (collision.gameObject.CompareTag("Player"))
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        PlayerStats playerStats = collision.gameObject.GetComponent<PlayerStats>();
-        if (playerStats == null) return;
-
-        // Is player to the right of the enemy?
-        bool playerOnRight = collision.transform.position.x > transform.position.x;
-
-        // Check if enemy is facing the player
-        bool facingPlayer =
-            (facingRight && playerOnRight) ||
-            (!facingRight && !playerOnRight);
-
-        if (facingPlayer)
+        if (collision.gameObject.CompareTag("Player"))
         {
-            animator.SetTrigger("isAttacking");
-            playerStats.TakeDamage(damage);
+            PlayerStats playerStats = collision.gameObject.GetComponent<PlayerStats>();
+            if (playerStats == null) return;
+
+            // Is player to the right of the enemy?
+            bool playerOnRight = collision.transform.position.x > transform.position.x;
+
+            // Check if enemy is facing the player
+            bool facingPlayer =
+                (facingRight && playerOnRight) ||
+                (!facingRight && !playerOnRight);
+
+            if (facingPlayer)
+            {
+                animator.SetTrigger("isAttacking");
+                playerStats.TakeDamage(damage);
+            }
         }
     }
-}
+    public void DestroyEnemy()
+    {
+        Destroy(gameObject);
+    }
 }
