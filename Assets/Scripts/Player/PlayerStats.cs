@@ -6,7 +6,6 @@ using UnityEngine.InputSystem;
 
 public class PlayerStats : MonoBehaviour
 {
-    // Singleton instance to allow global access from Enemy, PauseManager, and UpgradeMenu
     public static PlayerStats Instance { get; private set; }
 
     [Header("UI References")]
@@ -28,14 +27,18 @@ public class PlayerStats : MonoBehaviour
     public float CurrentStamina { get; private set; }
 
     private Animator animator;
+    private Rigidbody2D rb;
+    private PlayerInput playerInput;
 
     private void Awake()
     {
         if (Instance != null && Instance != this)
         {
             Instance.transform.position = this.transform.position;
-            Rigidbody2D rb = Instance.GetComponent<Rigidbody2D>();
-            if (rb != null) rb.linearVelocity = Vector2.zero;
+            Instance.gameObject.SetActive(true);
+
+            Rigidbody2D targetRb = Instance.GetComponent<Rigidbody2D>();
+            if (targetRb != null) targetRb.linearVelocity = Vector2.zero;
 
             Destroy(gameObject);
             return;
@@ -45,6 +48,9 @@ public class PlayerStats : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         animator = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody2D>();
+        playerInput = GetComponent<PlayerInput>();
+
         CurrentHealth = maxHealth;
         CurrentStamina = maxStamina;
     }
@@ -70,12 +76,17 @@ public class PlayerStats : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        if (invincibilityTimer > 0) return;
+        if (invincibilityTimer > 0)
+        {
+            return;
+        }
 
         CurrentHealth = Mathf.Clamp(CurrentHealth - damage, 0, maxHealth);
 
         if (animator != null)
+        {
             animator.SetTrigger("IsHurt");
+        }
 
         invincibilityTimer = invincibilityDuration;
 
@@ -87,7 +98,10 @@ public class PlayerStats : MonoBehaviour
 
     public bool UseStamina(float amount)
     {
-        if (CurrentStamina < amount) return false;
+        if (CurrentStamina < amount)
+        {
+            return false;
+        }
 
         CurrentStamina -= amount;
         return true;
@@ -95,9 +109,14 @@ public class PlayerStats : MonoBehaviour
 
     private void UpdateUI()
     {
-        // Only update if the references aren't missing
-        if (healthFill != null) healthFill.fillAmount = CurrentHealth / maxHealth;
-        if (staminaFill != null) staminaFill.fillAmount = CurrentStamina / maxStamina;
+        if (healthFill != null)
+        {
+            healthFill.fillAmount = CurrentHealth / maxHealth;
+        }
+        if (staminaFill != null)
+        {
+            staminaFill.fillAmount = CurrentStamina / maxStamina;
+        }
     }
 
     private void Die()
@@ -122,30 +141,47 @@ public class PlayerStats : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        bool isGameplayScene = (scene.name == "Level1" || scene.name == "Level2" || scene.name == "Upgrade");
+        gameObject.SetActive(isGameplayScene);
+        
+        if (!isGameplayScene)
+        {
+            return;
+        }
+
         GameObject healthObj = GameObject.Find("HealthBarFill");
         GameObject staminaObj = GameObject.Find("StaminaBarFill");
 
-        if (healthObj != null) healthFill = healthObj.GetComponent<Image>();
-        if (staminaObj != null) staminaFill = staminaObj.GetComponent<Image>();
+        if (healthObj != null)
+        {
+            healthFill = healthObj.GetComponent<Image>();
+        }
+        if (staminaObj != null)
+        {
+            staminaFill = staminaObj.GetComponent<Image>();
+        }
 
         if (scene.name == "Level1")
         {
-            CurrentHealth = maxHealth;
-            CurrentStamina = maxStamina;
+            CurrentHealth = 100;
+            CurrentStamina = 100;
+            attackDamage = 20f;
             invincibilityTimer = 0;
             upgradePoints = 0;
-            if (animator != null) animator.Play("Idle");
+            if (animator != null)
+            {
+                animator.Play("Idle");
+            }
         }
 
         GameObject spawnPoint = GameObject.FindWithTag("SpawnPoint");
         if (spawnPoint != null)
         {
-            Rigidbody2D rb = GetComponent<Rigidbody2D>();
             if (rb != null)
             {
                 rb.linearVelocity = Vector2.zero;
-                transform.position = spawnPoint.transform.position;
             }
+            transform.position = spawnPoint.transform.position;
         }
 
         CinemachineCamera cmCam = FindFirstObjectByType<CinemachineCamera>();
@@ -154,12 +190,11 @@ public class PlayerStats : MonoBehaviour
             cmCam.Follow = transform;
         }
 
-        PlayerInput input = GetComponent<PlayerInput>();
-        if (input != null)
+        if (playerInput != null)
         {
-            input.enabled = false;
-            input.enabled = true;
-            input.SwitchCurrentActionMap("Gameplay");
+            playerInput.enabled = false;
+            playerInput.enabled = true;
+            playerInput.SwitchCurrentActionMap("Gameplay");
         }
     }
 }
