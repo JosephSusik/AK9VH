@@ -72,6 +72,11 @@ public class EnemyController : MonoBehaviour
 
     private void Die()
     {
+        if (PlayerStats.Instance != null)
+        {
+            PlayerStats.Instance.AddUpgradePoints(2);
+        }
+
         Debug.Log($"enemy dies hp: {currentHealth}");
         animator.SetTrigger("isDead");
         rb.simulated = false;

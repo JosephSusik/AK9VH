@@ -16,7 +16,6 @@ public class PlayerController : MonoBehaviour
     [Header("Components")]
     private Rigidbody2D rb;
     private Animator animator;
-    private PlayerStats stats;
 
     [Header("Combat Logic")]
     public Transform attackPoint;
@@ -27,7 +26,6 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        stats = GetComponent<PlayerStats>();
     }
 
     private void Update()
@@ -48,7 +46,7 @@ public class PlayerController : MonoBehaviour
     {
         if (Time.timeScale == 0f) return; // Ignore input when game is paused
 
-        if (stats.UseStamina(50f))
+        if (PlayerStats.Instance != null && PlayerStats.Instance.UseStamina(50f))
         {
             animator.SetTrigger("IsAttacking");
             StartCoroutine(DelayedAttackCheck());
@@ -67,7 +65,7 @@ public class PlayerController : MonoBehaviour
 
         if (hits.Length == 0)
         {
-            stats.TakeDamage(stats.attackDamage);
+            PlayerStats.Instance.TakeDamage(PlayerStats.Instance.attackDamage);
         }
 
 
@@ -76,8 +74,8 @@ public class PlayerController : MonoBehaviour
             EnemyController enemy = hit.GetComponent<EnemyController>();
             if (enemy != null)
             {
-                Debug.Log($"Enemy hit: {enemy.name} took {stats.attackDamage} damage");
-                enemy.TakeDamage(stats.attackDamage);
+                Debug.Log($"Enemy hit: {enemy.name} took {PlayerStats.Instance.attackDamage} damage");
+                enemy.TakeDamage(PlayerStats.Instance.attackDamage);
             }
         }
     }

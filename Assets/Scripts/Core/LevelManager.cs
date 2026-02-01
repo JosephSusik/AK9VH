@@ -25,4 +25,11 @@ public class LevelManager : MonoBehaviour
     public void LoadMenu() => SceneManager.LoadScene(mainMenuName);
     public void LoadGameOver() => SceneManager.LoadScene(gameOverLevelName);
     public void QuitGame() => Application.Quit();
+    public void LoadLevelByName(string sceneName)
+    {
+        if (!string.IsNullOrEmpty(sceneName))
+        {
+            SceneManager.LoadScene(sceneName);
+        }
+    }
 }
