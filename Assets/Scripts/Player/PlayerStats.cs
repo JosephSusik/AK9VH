@@ -6,13 +6,14 @@ using UnityEngine.InputSystem;
 
 public class PlayerStats : MonoBehaviour
 {
+    // Singleton instance to allow global access from Enemy, PauseManager, and UpgradeMenu
     public static PlayerStats Instance { get; private set; }
 
-    [Header("UI")]
+    [Header("UI References")]
     [SerializeField] private Image healthFill;
     [SerializeField] private Image staminaFill;
 
-    [Header("Settings")]
+    [Header("Base Stats")]
     public float maxHealth = 100f;
     public float maxStamina = 100f;
     public float staminaRegenRate = 15f;
@@ -32,11 +33,15 @@ public class PlayerStats : MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
+            Instance.transform.position = this.transform.position;
+            Rigidbody2D rb = Instance.GetComponent<Rigidbody2D>();
+            if (rb != null) rb.linearVelocity = Vector2.zero;
+
             Destroy(gameObject);
             return;
         }
-        Instance = this;
 
+        Instance = this;
         DontDestroyOnLoad(gameObject);
 
         animator = GetComponent<Animator>();
@@ -65,13 +70,12 @@ public class PlayerStats : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        if (invincibilityTimer > 0)
-        {
-            return;
-        }
+        if (invincibilityTimer > 0) return;
 
         CurrentHealth = Mathf.Clamp(CurrentHealth - damage, 0, maxHealth);
-        animator.SetTrigger("IsHurt");
+
+        if (animator != null)
+            animator.SetTrigger("IsHurt");
 
         invincibilityTimer = invincibilityDuration;
 
@@ -83,18 +87,17 @@ public class PlayerStats : MonoBehaviour
 
     public bool UseStamina(float amount)
     {
-        if (CurrentStamina < amount)
-        {
-            return false;
-        }
+        if (CurrentStamina < amount) return false;
+
         CurrentStamina -= amount;
         return true;
     }
 
     private void UpdateUI()
     {
-        healthFill.fillAmount = CurrentHealth / maxHealth;
-        staminaFill.fillAmount = CurrentStamina / maxStamina;
+        // Only update if the references aren't missing
+        if (healthFill != null) healthFill.fillAmount = CurrentHealth / maxHealth;
+        if (staminaFill != null) staminaFill.fillAmount = CurrentStamina / maxStamina;
     }
 
     private void Die()
@@ -119,6 +122,21 @@ public class PlayerStats : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        GameObject healthObj = GameObject.Find("HealthBarFill");
+        GameObject staminaObj = GameObject.Find("StaminaBarFill");
+
+        if (healthObj != null) healthFill = healthObj.GetComponent<Image>();
+        if (staminaObj != null) staminaFill = staminaObj.GetComponent<Image>();
+
+        if (scene.name == "Level1")
+        {
+            CurrentHealth = maxHealth;
+            CurrentStamina = maxStamina;
+            invincibilityTimer = 0;
+            upgradePoints = 0;
+            if (animator != null) animator.Play("Idle");
+        }
+
         GameObject spawnPoint = GameObject.FindWithTag("SpawnPoint");
         if (spawnPoint != null)
         {
