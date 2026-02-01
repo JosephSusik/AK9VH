@@ -1,19 +1,14 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class PauseManager : MonoBehaviour
 {
     [SerializeField] private GameObject pauseMenuObject;
     [SerializeField] private TextMeshProUGUI statsText;
 
-    private PlayerStats stats;
     private bool isPaused;
-
-    private void Awake()
-    {
-        stats = GetComponent<PlayerStats>();
-    }
 
     public void OnPause(InputValue value)
     {
@@ -78,8 +73,31 @@ public class PauseManager : MonoBehaviour
 
     private void UpdatePausedText()
     {
-        statsText.text = $"Health: {Mathf.RoundToInt(stats.CurrentHealth)} / {stats.maxHealth}\n" +
-                         $"Stamina: {Mathf.RoundToInt(stats.CurrentStamina)} / {stats.maxStamina}\n" +
-                         $"Attack: {stats.attackDamage}";
+        statsText.text = $"Health: {Mathf.RoundToInt(PlayerStats.Instance.CurrentHealth)} / {PlayerStats.Instance.maxHealth}\n" +
+                         $"Stamina: {Mathf.RoundToInt(PlayerStats.Instance.CurrentStamina)} / {PlayerStats.Instance.maxStamina}\n" +
+                         $"Attack: {PlayerStats.Instance.attackDamage}\n" +
+                         $"Upgrade points: {PlayerStats.Instance.upgradePoints}";
+    }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnLevelFinishedLoading;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnLevelFinishedLoading;
+    }
+
+    private void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
+    {
+        GameObject foundUI = GameObject.Find("PauseOverlay");
+
+        if (foundUI != null)
+        {
+            pauseMenuObject = foundUI;
+            statsText = foundUI.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+            pauseMenuObject.SetActive(false);
+        }
     }
 }

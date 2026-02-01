@@ -72,6 +72,11 @@ public class EnemyController : MonoBehaviour
 
     private void Die()
     {
+        if (PlayerStats.Instance != null)
+        {
+            PlayerStats.Instance.AddUpgradePoints(2);
+        }
+
         animator.SetTrigger("isDead");
         rb.simulated = false;
         GetComponent<Collider2D>().enabled = false;
