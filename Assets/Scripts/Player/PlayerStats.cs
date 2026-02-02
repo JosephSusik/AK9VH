@@ -22,6 +22,8 @@ public class PlayerStats : MonoBehaviour
     public float attackDamage;
     public float staminaRegenRate = 15f;
     public int upgradePoints = 0;
+    public int hitCombo = 0;
+    public float comboMultiplier = 1.0f;
 
     public float CurrentHealth { get; private set; }
     public float CurrentStamina { get; private set; }
@@ -60,6 +62,8 @@ public class PlayerStats : MonoBehaviour
         CurrentStamina = maxStamina;
         upgradePoints = 0;
         invincibilityTimer = 0;
+        hitCombo = 0;
+        comboMultiplier = 1.0f;
 
         if (animator != null)
         {
@@ -114,6 +118,18 @@ public class PlayerStats : MonoBehaviour
 
         CurrentStamina -= amount;
         return true;
+    }
+
+    public void RegisterHit()
+    {
+        hitCombo++;
+        comboMultiplier = Mathf.Min(1.0f + (hitCombo * 0.1f), 1.5f);
+    }
+
+    public void ResetCombo()
+    {
+        hitCombo = 0;
+        comboMultiplier = 1.0f;
     }
 
     private void UpdateUI()

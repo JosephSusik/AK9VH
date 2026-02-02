@@ -65,19 +65,23 @@ public class PlayerController : BaseController
 
         if (hits.Length == 0)
         {
+            PlayerStats.Instance.ResetCombo();
             PlayerStats.Instance.TakeDamage(PlayerStats.Instance.attackDamage);
         }
-
-
-        foreach (Collider2D hit in hits)
+        else
         {
-            EnemyController enemy = hit.GetComponent<EnemyController>();
-            if (enemy != null)
-            {
-                Debug.Log($"Enemy hit: {enemy.name} took {PlayerStats.Instance.attackDamage} damage");
-                enemy.TakeDamage(PlayerStats.Instance.attackDamage);
-            }
+            PlayerStats.Instance.RegisterHit();
         }
+
+            foreach (Collider2D hit in hits)
+            {
+                if (hit.TryGetComponent(out EnemyController enemy))
+                {
+                    float finalDamage = PlayerStats.Instance.attackDamage * PlayerStats.Instance.comboMultiplier;
+                    Debug.Log($"Enemy hit: {enemy.name} took {finalDamage} damage");
+                    enemy.TakeDamage(finalDamage);
+                }
+            }
     }
 
     private void Hurt()
