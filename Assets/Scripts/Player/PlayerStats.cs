@@ -97,7 +97,7 @@ public class PlayerStats : MonoBehaviour
             animator.SetTrigger("IsHurt");
         }
 
-        invincibilityTimer = 1f;
+        invincibilityTimer = 0.5f;
 
         if (CurrentHealth <= 0)
         {

@@ -3,11 +3,11 @@ using UnityEngine.InputSystem;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-public class PauseController : MonoBehaviour
+public class PauseController : BaseController
 {
     [SerializeField] private GameObject pauseMenuObject;
     [SerializeField] private TextMeshProUGUI statsText;
-    private bool isPaused;
+    private bool isPaused;  
 
     public void OnPause(InputValue value)
     {
@@ -17,28 +17,10 @@ public class PauseController : MonoBehaviour
         }
     }
 
-    public void OnMenu(InputValue value)
+    public override void BackToMenu()
     {
-        if (value.isPressed)
-        {
-            BackToMenu();
-        }
-    }
-
-    public void OnRestart(InputValue value)
-    {
-        if (value.isPressed)
-        {
-            RestartGame();
-        }
-    }
-
-    public void OnQuit(InputValue value)
-    {
-        if (value.isPressed)
-        {
-            QuitGame();
-        }
+        Time.timeScale = 1f;
+        base.BackToMenu();
     }
 
     public void TogglePause()
@@ -53,29 +35,12 @@ public class PauseController : MonoBehaviour
         }
     }
 
-    public void BackToMenu()
-    {
-        Time.timeScale = 1f;
-        SceneManager.Instance.ChangeScene(SceneManager.GameScene.MainMenu);
-    }
-
-    public void RestartGame()
-    {
-        Time.timeScale = 1f;
-        SceneManager.Instance.RestartGame();
-    }
-
-    public void QuitGame()
-    {
-        SceneManager.Instance.QuitGame();
-    }
-
     private void UpdatePausedText()
     {
         var stats = PlayerStats.Instance;
         statsText.text = $"Health: {Mathf.RoundToInt(stats.CurrentHealth)} / {stats.maxHealth}\n" +
                          $"Stamina: {Mathf.RoundToInt(stats.CurrentStamina)} / {stats.maxStamina}\n" +
-                         $"Attack: {stats.attackDamage}\n" +
+                         $"Attack power: {stats.attackDamage}\n" +
                          $"Upgrade points: {stats.upgradePoints}";
     }
 
@@ -96,7 +61,7 @@ public class PauseController : MonoBehaviour
         if (foundUI != null)
         {
             pauseMenuObject = foundUI;
-            statsText = foundUI.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+            statsText = foundUI.GetComponentInChildren<TextMeshProUGUI>();
             pauseMenuObject.SetActive(false);
         }
     }

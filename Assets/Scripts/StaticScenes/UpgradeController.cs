@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
 
-public class UpgradeController : MonoBehaviour
+public class UpgradeController : BaseController
 {
     [SerializeField] private TextMeshProUGUI availablePointsText;
     [SerializeField] private TextMeshProUGUI healthStatsText;
@@ -48,10 +48,5 @@ public class UpgradeController : MonoBehaviour
     public void StartNextLevel()
     {
         SceneManager.Instance.ChangeScene(SceneManager.GameScene.Level2);
-    }
-
-    public void BackToMenu()
-    {
-        SceneManager.Instance.ChangeScene(SceneManager.GameScene.MainMenu);
     }
 }
