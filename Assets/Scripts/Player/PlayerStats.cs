@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using Unity.Cinemachine;
 using UnityEngine.InputSystem;
 
 public class PlayerStats : MonoBehaviour
@@ -12,16 +11,17 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private Image healthFill;
     [SerializeField] private Image staminaFill;
 
-    [Header("Base Stats")]
-    public float maxHealth = 100f;
-    public float maxStamina = 100f;
-    public float staminaRegenRate = 15f;
-    public float attackDamage = 20f;
-    public int upgradePoints = 0;
+    [Header("Default Stats")]
+    [SerializeField] private float defaultMaxHealth = 100f;
+    [SerializeField] private float defaultMaxStamina = 100f;
+    [SerializeField] private float defaultAttackDamage = 20f;
 
-    [Header("Invincibility")]
-    public float invincibilityDuration = 1f;
-    private float invincibilityTimer;
+    [Header("Base Stats")]
+    public float maxHealth;
+    public float maxStamina;
+    public float attackDamage;
+    public float staminaRegenRate = 15f;
+    public int upgradePoints = 0;
 
     public float CurrentHealth { get; private set; }
     public float CurrentStamina { get; private set; }
@@ -29,17 +29,13 @@ public class PlayerStats : MonoBehaviour
     private Animator animator;
     private Rigidbody2D rb;
     private PlayerInput playerInput;
+    private float invincibilityTimer;
 
     private void Awake()
     {
         if (Instance != null && Instance != this)
         {
-            Instance.transform.position = this.transform.position;
             Instance.gameObject.SetActive(true);
-
-            Rigidbody2D targetRb = Instance.GetComponent<Rigidbody2D>();
-            if (targetRb != null) targetRb.linearVelocity = Vector2.zero;
-
             Destroy(gameObject);
             return;
         }
@@ -51,27 +47,40 @@ public class PlayerStats : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         playerInput = GetComponent<PlayerInput>();
 
+        StatsInit();
+    }
+
+    public void StatsInit()
+    {
+        maxHealth = defaultMaxHealth;
+        maxStamina = defaultMaxStamina;
+        attackDamage = defaultAttackDamage;
+
         CurrentHealth = maxHealth;
         CurrentStamina = maxStamina;
+        upgradePoints = 0;
+        invincibilityTimer = 0;
+
+        if (animator != null)
+        {
+            animator.Play("Idle");
+        }
+
+        UpdateUI();
     }
 
     private void Update()
-    {
-        RegenerateStamina();
-        UpdateUI();
-
-        if (invincibilityTimer > 0)
-        {
-            invincibilityTimer -= Time.deltaTime;
-        }
-    }
-
-    private void RegenerateStamina()
     {
         if (CurrentStamina < maxStamina)
         {
             CurrentStamina = Mathf.MoveTowards(CurrentStamina, maxStamina, staminaRegenRate * Time.deltaTime);
         }
+
+        if (invincibilityTimer > 0)
+        {
+            invincibilityTimer -= Time.deltaTime;
+        }
+        UpdateUI();
     }
 
     public void TakeDamage(float damage)
@@ -88,7 +97,7 @@ public class PlayerStats : MonoBehaviour
             animator.SetTrigger("IsHurt");
         }
 
-        invincibilityTimer = invincibilityDuration;
+        invincibilityTimer = 1f;
 
         if (CurrentHealth <= 0)
         {
@@ -149,45 +158,9 @@ public class PlayerStats : MonoBehaviour
             return;
         }
 
-        GameObject healthObj = GameObject.Find("HealthBarFill");
-        GameObject staminaObj = GameObject.Find("StaminaBarFill");
-
-        if (healthObj != null)
-        {
-            healthFill = healthObj.GetComponent<Image>();
-        }
-        if (staminaObj != null)
-        {
-            staminaFill = staminaObj.GetComponent<Image>();
-        }
-
         if (scene.name == "Level1")
         {
-            CurrentHealth = 100;
-            CurrentStamina = 100;
-            attackDamage = 20f;
-            invincibilityTimer = 0;
-            upgradePoints = 0;
-            if (animator != null)
-            {
-                animator.Play("Idle");
-            }
-        }
-
-        GameObject spawnPoint = GameObject.FindWithTag("SpawnPoint");
-        if (spawnPoint != null)
-        {
-            if (rb != null)
-            {
-                rb.linearVelocity = Vector2.zero;
-            }
-            transform.position = spawnPoint.transform.position;
-        }
-
-        CinemachineCamera cmCam = FindFirstObjectByType<CinemachineCamera>();
-        if (cmCam != null)
-        {
-            cmCam.Follow = transform;
+            StatsInit();
         }
 
         if (playerInput != null)

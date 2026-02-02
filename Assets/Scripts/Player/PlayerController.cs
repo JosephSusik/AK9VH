@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Combat Logic")]
     public Transform attackPoint;
-    public float attackRange = 0.5f;
+    public float attackRange = 1f;
     public LayerMask enemyLayers;
 
     private void Awake()
