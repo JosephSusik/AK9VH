@@ -122,8 +122,8 @@ public class PlayerStats : MonoBehaviour
 
     public void RegisterHit()
     {
-        hitCombo++;
         comboMultiplier = Mathf.Min(1.0f + (hitCombo * 0.1f), 1.5f);
+        hitCombo++;
     }
 
     public void ResetCombo()
