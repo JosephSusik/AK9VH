@@ -13,8 +13,9 @@ public class EnemyController : MonoBehaviour
     public float detectionRange = 8f;
     public float attackRange = 1.5f;
     public float losePlayerRange = 12f;
+    public float optimalAttackDistance = 1.2f; // Preferred distance to maintain from player
     private Transform player;
-    private enum EnemyState { Patrol, Chase, Attack }
+    private enum EnemyState { Patrol, Chase, Attack, PrepareAttack, Recover }
     private EnemyState currentState = EnemyState.Patrol;
 
     [Header("Combat")]
@@ -25,6 +26,14 @@ public class EnemyController : MonoBehaviour
     public float initialAttackDelay = 0.5f; // Delay before first attack when entering range
     private float lastAttackTime;
     private bool isFirstAttackInSession = true; // Track if this is first attack in current session
+
+    [Header("Combat Timing")]
+    public float prepareAttackDuration = 0.3f; // Time to "wind up" before attacking
+    public float recoveryDuration = 0.6f; // Time to back off after attacking
+    public float recoveryBackoffDistance = 0.8f; // How far to back away during recovery
+    
+    private float stateTimer; // Timer for timed states
+    private bool isAttacking = false; // Track if currently in attack animation
 
     [Header("UI")]
     public Image healthBarFill;
@@ -77,25 +86,73 @@ public class EnemyController : MonoBehaviour
                 break;
 
             case EnemyState.Chase:
-                // The 0.2 key, without it distanceToPlayer is too big, even tho they colide
-                if (distanceToPlayer <= attackRange + 0.2)
+                // Enter prepare attack state when in range
+                if (distanceToPlayer <= attackRange + 0.2f)
                 {
-                    currentState = EnemyState.Attack;
-                    currentSpeed = 0f;
-                    isFirstAttackInSession = true; // Reset for new attack session
+                    // Check if enough time has passed since last attack
+                    float requiredCooldown = isFirstAttackInSession ? initialAttackDelay : attackCooldown;
+                    
+                    if (Time.time >= lastAttackTime + requiredCooldown)
+                    {
+                        currentState = EnemyState.PrepareAttack;
+                        stateTimer = prepareAttackDuration;
+                        currentSpeed = 0f;
+                    }
+                    else
+                    {
+                        // Still cooling down, maintain distance
+                        currentSpeed = chaseSpeed * 0.3f; // Slow approach
+                    }
                 }
                 else if (distanceToPlayer > losePlayerRange)
                 {
                     currentState = EnemyState.Patrol;
                     currentSpeed = patrolSpeed;
+                    isFirstAttackInSession = true; // Reset for next encounter
+                }
+                break;
+
+            case EnemyState.PrepareAttack:
+                stateTimer -= Time.deltaTime;
+                if (stateTimer <= 0f)
+                {
+                    // Transition to actual attack
+                    currentState = EnemyState.Attack;
+                    isAttacking = true;
+                }
+                else if (distanceToPlayer > attackRange + 0.5f)
+                {
+                    // Player moved away during preparation
+                    currentState = EnemyState.Chase;
+                    currentSpeed = chaseSpeed;
                 }
                 break;
 
             case EnemyState.Attack:
-                if (distanceToPlayer > attackRange)
+                // Attack state handles itself, transitions in FixedUpdate
+                break;
+
+            case EnemyState.Recover:
+                stateTimer -= Time.deltaTime;
+                if (stateTimer <= 0f)
                 {
-                    currentState = EnemyState.Chase;
-                    currentSpeed = chaseSpeed;
+                    // Recovery complete, decide next state
+                    if (distanceToPlayer <= attackRange + 0.5f)
+                    {
+                        currentState = EnemyState.Chase;
+                        currentSpeed = chaseSpeed;
+                    }
+                    else if (distanceToPlayer > losePlayerRange)
+                    {
+                        currentState = EnemyState.Patrol;
+                        currentSpeed = patrolSpeed;
+                        isFirstAttackInSession = true;
+                    }
+                    else
+                    {
+                        currentState = EnemyState.Chase;
+                        currentSpeed = chaseSpeed;
+                    }
                 }
                 break;
         }
@@ -115,8 +172,16 @@ public class EnemyController : MonoBehaviour
                 ChasePlayer();
                 break;
 
+            case EnemyState.PrepareAttack:
+                PrepareAttack();
+                break;
+
             case EnemyState.Attack:
-                AttackPlayer();
+                ExecuteAttack();
+                break;
+
+            case EnemyState.Recover:
+                RecoverFromAttack();
                 break;
         }
     }
@@ -141,11 +206,28 @@ public class EnemyController : MonoBehaviour
     {
         if (player == null) return;
 
+        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+        
         // Calculate horizontal direction to player
         float directionX = Mathf.Sign(player.position.x - transform.position.x);
         
+        // Smart positioning: slow down when getting close to optimal distance
+        float moveSpeed = chaseSpeed;
+        if (distanceToPlayer < optimalAttackDistance + 0.3f)
+        {
+            // Very close, move slower or back off slightly
+            moveSpeed = chaseSpeed * 0.4f;
+            
+            // If too close, actually back away
+            if (distanceToPlayer < optimalAttackDistance * 0.8f)
+            {
+                directionX *= -1; // Reverse direction
+                moveSpeed = chaseSpeed * 0.5f;
+            }
+        }
+        
         // Move horizontally only, preserve vertical velocity (gravity)
-        rb.linearVelocity = new Vector2(directionX * chaseSpeed, rb.linearVelocity.y);
+        rb.linearVelocity = new Vector2(directionX * moveSpeed, rb.linearVelocity.y);
 
         // Face the player
         if ((directionX > 0 && !facingRight) || (directionX < 0 && facingRight))
@@ -156,7 +238,26 @@ public class EnemyController : MonoBehaviour
         animator.SetBool("isWalking", true);
     }
 
-    private void AttackPlayer()
+    private void PrepareAttack()
+    {
+        if (player == null) return;
+
+        // Stop completely and face player during preparation
+        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        animator.SetBool("isWalking", false);
+
+        // Face the player
+        float directionX = player.position.x - transform.position.x;
+        if ((directionX > 0 && !facingRight) || (directionX < 0 && facingRight))
+        {
+            Flip();
+        }
+
+        // Optional: You could add a "prepare" animation trigger here
+        // animator.SetBool("isPreparing", true);
+    }
+
+    private void ExecuteAttack()
     {
         if (player == null) return;
 
@@ -171,30 +272,36 @@ public class EnemyController : MonoBehaviour
             Flip();
         }
 
-        // For the first attack, use initialAttackDelay
-        // For all subsequent attacks, ALWAYS use attackCooldown
-        if (isFirstAttackInSession)
+        // Trigger attack animation and store target
+        animator.SetTrigger("isAttacking");
+        targetPlayer = player.GetComponent<PlayerStats>();
+        
+        lastAttackTime = Time.time;
+        isFirstAttackInSession = false; // No longer first attack
+        
+        // Transition to recovery state
+        currentState = EnemyState.Recover;
+        stateTimer = recoveryDuration;
+        isAttacking = false;
+    }
+
+    private void RecoverFromAttack()
+    {
+        if (player == null) return;
+
+        // Back away slightly during recovery
+        float directionX = Mathf.Sign(transform.position.x - player.position.x); // Away from player
+        float backoffSpeed = chaseSpeed * 0.5f;
+        
+        rb.linearVelocity = new Vector2(directionX * backoffSpeed, rb.linearVelocity.y);
+        
+        animator.SetBool("isWalking", true);
+
+        // Keep facing the player even while backing away
+        float directionToPlayer = player.position.x - transform.position.x;
+        if ((directionToPlayer > 0 && !facingRight) || (directionToPlayer < 0 && facingRight))
         {
-            // First attack in this session
-            if (Time.time >= lastAttackTime + initialAttackDelay)
-            {
-                animator.SetTrigger("isAttacking");
-                targetPlayer = player.GetComponent<PlayerStats>();
-                
-                lastAttackTime = Time.time;
-                isFirstAttackInSession = false; // No longer first attack
-            }
-        }
-        else
-        {
-            // Subsequent attacks - always use full attackCooldown
-            if (Time.time >= lastAttackTime + attackCooldown)
-            {
-                animator.SetTrigger("isAttacking");
-                targetPlayer = player.GetComponent<PlayerStats>();
-                
-                lastAttackTime = Time.time;
-            }
+            Flip();
         }
     }
 
@@ -212,8 +319,15 @@ public class EnemyController : MonoBehaviour
         }
         else
         {
+            // When hit during attack preparation or recovery, interrupt and chase
+            if (currentState == EnemyState.PrepareAttack || currentState == EnemyState.Recover)
+            {
+                currentState = EnemyState.Chase;
+                currentSpeed = chaseSpeed;
+                isAttacking = false;
+            }
             // When hit, switch to chase if not already
-            if (currentState == EnemyState.Patrol)
+            else if (currentState == EnemyState.Patrol)
             {
                 currentState = EnemyState.Chase;
                 currentSpeed = chaseSpeed;
@@ -256,6 +370,9 @@ public class EnemyController : MonoBehaviour
         
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
+        
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, optimalAttackDistance);
         
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, losePlayerRange);
