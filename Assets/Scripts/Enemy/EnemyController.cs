@@ -22,7 +22,9 @@ public class EnemyController : MonoBehaviour
     private float currentHealth;
     public float damage = 35f;
     public float attackCooldown = 1.5f;
+    public float initialAttackDelay = 0.5f; // Delay before first attack when entering range
     private float lastAttackTime;
+    private bool isFirstAttackInSession = true; // Track if this is first attack in current session
 
     [Header("UI")]
     public Image healthBarFill;
@@ -41,6 +43,8 @@ public class EnemyController : MonoBehaviour
         UpdateHealthBar();
         patrolTimer = patrolTime;
         currentSpeed = patrolSpeed;
+        
+        lastAttackTime = -999f; // Initialize to very old time
         
         // Freeze rotation, so the enemy doesn't tumble
         rb.freezeRotation = true;
@@ -78,6 +82,7 @@ public class EnemyController : MonoBehaviour
                 {
                     currentState = EnemyState.Attack;
                     currentSpeed = 0f;
+                    isFirstAttackInSession = true; // Reset for new attack session
                 }
                 else if (distanceToPlayer > losePlayerRange)
                 {
@@ -166,22 +171,30 @@ public class EnemyController : MonoBehaviour
             Flip();
         }
 
-        // Attack with cooldown
-        if (Time.time >= lastAttackTime + attackCooldown)
+        // For the first attack, use initialAttackDelay
+        // For all subsequent attacks, ALWAYS use attackCooldown
+        if (isFirstAttackInSession)
         {
-            animator.SetTrigger("isAttacking");
-            
-            // PlayerStats playerStats = player.GetComponent<PlayerStats>();
-            // if (playerStats != null)
-            // {
-            //     playerStats.TakeDamage(damage);
-            // }
-            
-            // lastAttackTime = Time.time;
-            // Store player reference for when animation finishes
-            targetPlayer = player.GetComponent<PlayerStats>();
-            
-            lastAttackTime = Time.time;
+            // First attack in this session
+            if (Time.time >= lastAttackTime + initialAttackDelay)
+            {
+                animator.SetTrigger("isAttacking");
+                targetPlayer = player.GetComponent<PlayerStats>();
+                
+                lastAttackTime = Time.time;
+                isFirstAttackInSession = false; // No longer first attack
+            }
+        }
+        else
+        {
+            // Subsequent attacks - always use full attackCooldown
+            if (Time.time >= lastAttackTime + attackCooldown)
+            {
+                animator.SetTrigger("isAttacking");
+                targetPlayer = player.GetComponent<PlayerStats>();
+                
+                lastAttackTime = Time.time;
+            }
         }
     }
 
@@ -252,6 +265,7 @@ public class EnemyController : MonoBehaviour
     {
         Destroy(gameObject);
     }
+    
     public void DealDamage()
     {
         if (targetPlayer != null)
