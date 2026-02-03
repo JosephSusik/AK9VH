@@ -185,6 +185,8 @@ public class PlayerStats : MonoBehaviour
             StatsInit();
         }
 
+        gameObject.tag = "Player";
+
         if (playerInput != null)
         {
             playerInput.enabled = false;

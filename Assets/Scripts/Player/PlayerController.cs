@@ -43,8 +43,6 @@ public class PlayerController : BaseController
         else if (moveInput.x < 0 && facingRight) Flip();
 
         animator.SetFloat("Speed", Mathf.Abs(moveInput.x));
-        animator.SetBool("IsGrounded", IsGrounded());
-        animator.SetFloat("VelocityY", rb.linearVelocity.y);
     }
 
     private void FixedUpdate()

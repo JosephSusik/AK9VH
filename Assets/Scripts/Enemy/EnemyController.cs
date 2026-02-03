@@ -70,7 +70,19 @@ public class EnemyController : MonoBehaviour
     {
         if (currentHealth <= 0) return;
 
-        if (player == null) return;
+        if (player == null)
+        {
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+            {
+                player = playerObj.transform;
+            }
+        }
+
+        if (player == null || !player.gameObject.activeInHierarchy)
+        {
+            return;
+        }
 
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
@@ -382,9 +394,17 @@ public class EnemyController : MonoBehaviour
     
     public void DealDamage()
     {
+        if (targetPlayer == null)
+        {
+            targetPlayer = PlayerStats.Instance;
+        }
+
         if (targetPlayer != null)
         {
-            targetPlayer.TakeDamage(damage);
+            if (targetPlayer.gameObject.activeInHierarchy)
+            {
+                targetPlayer.TakeDamage(damage);
+            }
         }
     }
 }
