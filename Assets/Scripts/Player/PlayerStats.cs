@@ -109,6 +109,12 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
+    public void Heal(float amount)
+    {
+        CurrentHealth = Mathf.Clamp(CurrentHealth + amount, 0, maxHealth);
+        UpdateUI();
+    }
+
     public bool UseStamina(float amount)
     {
         if (CurrentStamina < amount)

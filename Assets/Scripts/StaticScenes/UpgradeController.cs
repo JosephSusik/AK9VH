@@ -23,7 +23,7 @@ public class UpgradeController : BaseController
 
     public void UpgradeHealth() => PurchaseUpgrade(() => {
         PlayerStats.Instance.maxHealth += 20f;
-        PlayerStats.Instance.TakeDamage(-20f);
+        PlayerStats.Instance.Heal(20f);
     });
 
     public void UpgradeStamina() => PurchaseUpgrade(() =>
