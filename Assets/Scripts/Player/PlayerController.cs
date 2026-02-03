@@ -124,7 +124,7 @@ public class PlayerController : BaseController
             Gizmos.DrawLine(groundCheck.position, groundCheck.position + Vector3.down * groundCheckDistance);
         }
     }
-    
+
     private void Flip()
     {
         facingRight = !facingRight;
