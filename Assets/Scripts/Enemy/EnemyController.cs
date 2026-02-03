@@ -252,9 +252,6 @@ public class EnemyController : MonoBehaviour
         {
             Flip();
         }
-
-        // Optional: You could add a "prepare" animation trigger here
-        // animator.SetBool("isPreparing", true);
     }
 
     private void ExecuteAttack()
