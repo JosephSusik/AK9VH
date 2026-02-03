@@ -22,6 +22,11 @@ public class PlayerController : BaseController
     public float attackRange = 1f;
     public LayerMask enemyLayers;
 
+    [Header("Ground Check")]
+    public Transform groundCheck;
+    public float groundCheckDistance = 0.1f;
+    public LayerMask groundLayer;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -101,11 +106,25 @@ public class PlayerController : BaseController
     public void OnAttack(InputValue value) { if (value.isPressed) Attack(); }
     public void OnHurt(InputValue value) { if (value.isPressed) Hurt(); }
 
+    // private bool IsGrounded()
+    // {
+    //     return rb.linearVelocity.y <= 0.01f;
+    // }
     private bool IsGrounded()
     {
-        return rb.linearVelocity.y <= 0.01f;
+        return Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, groundLayer);
     }
 
+    // Optional: Visualize in editor
+    private void OnDrawGizmosSelected()
+    {
+        if (groundCheck != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(groundCheck.position, groundCheck.position + Vector3.down * groundCheckDistance);
+        }
+    }
+    
     private void Flip()
     {
         facingRight = !facingRight;
